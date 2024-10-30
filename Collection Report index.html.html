@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Collection Report</title>
+    <style>
+        body {
+            background-color: #001f3f; /* Dark blue background */
+            color: white; /* Text color for visibility */
+            font-family: Arial, sans-serif; /* Font style */
+        }
+        .form-container {
+            background-color: rgba(255, 255, 255, 0.1); /* Light background with transparency */
+            padding: 20px;
+            border-radius: 10px; /* Rounded corners */
+            max-width: 600px; /* Max width for the form */
+            margin: auto; /* Center the form */
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); /* Light shadow for depth */
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+        }
+        .send-button {
+            background-color: green; /* Send button color */
+            color: white;
+        }
+        .clear-button {
+            background-color: red; /* Clear button color */
+            color: white;
+        }
+        .download-button {
+            background-color: blue; /* Download CSV button color */
+            color: white;
+        }
+    </style>
+    <script>
+        let submissions = []; // Array to store submissions
+
+        function calculateTotal() {
+            const monday = parseFloat(document.getElementsByName('monday')[0].value) || 0;
+            const tuesday = parseFloat(document.getElementsByName('tuesday')[0].value) || 0;
+            const wednesday = parseFloat(document.getElementsByName('wednesday')[0].value) || 0;
+            const thursday = parseFloat(document.getElementsByName('thursday')[0].value) || 0;
+            const friday = parseFloat(document.getElementsByName('friday')[0].value) || 0;
+
+            const total = monday + tuesday + wednesday + thursday + friday;
+            document.getElementsByName('total')[0].value = total;
+        }
+
+        function submitForm() {
+            const name = document.getElementsByName('name')[0].value;
+            const forecast = document.getElementsByName('forecast')[0].value;
+            const week = document.getElementsByName('week')[0].value;
+            const monday = document.getElementsByName('monday')[0].value;
+            const tuesday = document.getElementsByName('tuesday')[0].value;
+            const wednesday = document.getElementsByName('wednesday')[0].value;
+            const thursday = document.getElementsByName('thursday')[0].value;
+            const friday = document.getElementsByName('friday')[0].value;
+            const total = document.getElementsByName('total')[0].value;
+            const remarks = document.getElementsByName('remarks')[0].value;
+
+            const submission = {
+                name,
+                forecast,
+                week,
+                monday,
+                tuesday,
+                wednesday,
+                thursday,
+                friday,
+                total,
+                remarks
+            };
+
+            submissions.push(submission);
+            displaySubmissions();
+            clearForm();
+        }
+
+        function displaySubmissions() {
+            const submissionTable = document.getElementById('submission-table');
+            submissionTable.innerHTML = ''; // Clear previous entries
+
+            // Create header row
+            const headerRow = document.createElement('tr');
+            headerRow.innerHTML = `
+                <th>Name</th>
+                <th>Collection Forecast</th>
+                <th>Week</th>
+                <th>Monday</th>
+                <th>Tuesday</th>
+                <th>Wednesday</th>
+                <th>Thursday</th>
+                <th>Friday</th>
+                <th>Total</th>
+                <th>Remarks</th>
+            `;
+            submissionTable.appendChild(headerRow);
+
+            submissions.forEach(submission => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${submission.name}</td>
+                    <td>${submission.forecast}</td>
+                    <td>${submission.week}</td>
+                    <td>${submission.monday}</td>
+                    <td>${submission.tuesday}</td>
+                    <td>${submission.wednesday}</td>
+                    <td>${submission.thursday}</td>
+                    <td>${submission.friday}</td>
+                    <td>${submission.total}</td>
+                    <td>${submission.remarks}</td>
+                `;
+                submissionTable.appendChild(row);
+            });
+        }
+
+        function clearForm() {
+            document.querySelector('form').reset();
+            document.getElementsByName('total')[0].value = '';
+        }
+
+        function downloadCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            const headers = ['Name', 'Collection Forecast', 'Week', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Total', 'Remarks'];
+            csvContent += headers.join(",") + "\n";
+
+            submissions.forEach(submission => {
+                const row = [
+                    submission.name,
+                    submission.forecast,
+                    submission.week,
+                    submission.monday,
+                    submission.tuesday,
+                    submission.wednesday,
+                    submission.thursday,
+                    submission.friday,
+                    submission.total,
+                    submission.remarks
+                ];
+                csvContent += row.join(",") + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'submissions.csv');
+            document.body.appendChild(link); // Required for Firefox
+
+            link.click();
+            document.body.removeChild(link); // Clean up
+        }
+    </script>
+</head>
+<body>
+    <div class="form-container">
+        <h1>COLLECTION REPORT</h1>
+        <form onsubmit="event.preventDefault(); submitForm();">
+            <table>
+                <tr>
+                    <td>Name:</td>
+                    <td><input type="text" name="name"></td>
+                </tr>
+                <tr>
+                    <td>Collection Forecast:</td>
+                    <td><input type="text" name="forecast"></td>
+                </tr>
+                <tr>
+                    <td>Week:</td>
+                    <td><input type="text" name="week"></td>
+                </tr>
+                <tr>
+                    <td>Monday:</td>
+                    <td><input type="text" name="monday" oninput="calculateTotal()"></td>
+                </tr>
+                <tr>
+                    <td>Tuesday:</td>
+                    <td><input type="text" name="tuesday" oninput="calculateTotal()"></td>
+                </tr>
+                <tr>
+                    <td>Wednesday:</td>
+                    <td><input type="text" name="wednesday" oninput="calculateTotal()"></td>
+                </tr>
+                <tr>
+                    <td>Thursday:</td>
+                    <td><input type="text" name="thursday" oninput="calculateTotal()"></td>
+                </tr>
+                <tr>
+                    <td>Friday:</td>
+                    <td><input type="text" name="friday" oninput="calculateTotal()"></td>
+                </tr>
+                <tr>
+                    <td>Total Collection:</td>
+                    <td><input type="text" name="total" readonly></td>
+                </tr>
+                <tr>
+                    <td>Remarks:</td>
+                    <td><input type="text" name="remarks"></td>
+                </tr>
+            </table>
+            <button type="submit" class="send-button">Send</button>
+            <button type="button" class="clear-button" onclick="clearForm()">Clear</button>
+            <button type="button" class="download-button" onclick="downloadCSV()">Download CSV</button>
+        </form>
+    </div>
+
+    <h2>All Submissions</h2>
+    <table id="submission-table" border="1"></table>
+</body>
+</html>
